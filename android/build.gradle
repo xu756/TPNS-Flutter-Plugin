@@ -25,15 +25,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    lint {
-        disable += 'InvalidPackage'
-    }
 }
 
 kotlin {
     compilerOptions {
         // 与宿主 Flutter/AGP 9 工程统一，避免 Java 17 / Kotlin 21 target 冲突。
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
