@@ -15,6 +15,18 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import java.util.*
 
 
+private inline fun <reified T> MethodCall.requireArguments(): T {
+    return requireNotNull(arguments<T>()) {
+        "TPNS method '$method' requires non-null arguments"
+    }
+}
+
+private fun <K, V : Any> Map<K, V>.requireValue(key: K): V {
+    return requireNotNull(this[key]) {
+        "TPNS argument '$key' is required"
+    }
+}
+
 public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
 
@@ -115,8 +127,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置accessId
      */
     private fun setAccessId(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, String>>()
-        val accessId = map[Extras.ACCESSID] as String
+        val map = call.requireArguments<Map<String, String>>()
+        val accessId = map.requireValue(Extras.ACCESSID) as String
         val value = accessId.toLong();
         Log.i(TAG, "调用信鸽SDK-->setAccessId()-----accessId=${value}")
         XGPushConfig.setAccessId(mPluginBinding.applicationContext, value);
@@ -125,8 +137,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置accessKey
      */
     private fun setAccessKey(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, String>>()
-        val accessKey = map[Extras.ACCESSKEY]
+        val map = call.requireArguments<Map<String, String>>()
+        val accessKey = map.requireValue(Extras.ACCESSKEY)
         Log.i(TAG, "调用信鸽SDK-->setAccessKey()-----accessKey=${accessKey}")
         XGPushConfig.setAccessKey(mPluginBinding.applicationContext, accessKey);
     }
@@ -135,8 +147,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置接入域名
      */
     private fun setServerSuffix(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, String>>()
-        val addr = map[Extras.ADDR]
+        val map = call.requireArguments<Map<String, String>>()
+        val addr = map.requireValue(Extras.ADDR)
         Log.i(TAG, "调用信鸽SDK-->setServerSuffix()-----addr=${addr}")
         XGApiConfig.setServerSuffix(mPluginBinding.applicationContext, addr);
     }
@@ -157,8 +169,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 开启Debug模式
      */
     private fun setEnableDebug(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<HashMap<String, Any>>()
-        val debug = map[Extras.DEBUG] as Boolean
+        val map = call.requireArguments<HashMap<String, Any>>()
+        val debug = map.requireValue(Extras.DEBUG) as Boolean
         Log.i(TAG, "调用信鸽SDK-->enableDebug()----->isDebug=${debug}")
         XGPushConfig.enableDebug(mPluginBinding.applicationContext, debug)
     }
@@ -167,8 +179,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置心跳时间间隔
      */
     fun setHeartbeatIntervalMs(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<HashMap<String, Any>>()
-        val interval = map[Extras.HEADER_BEAT_INTERVAL_MS] as Int
+        val map = call.requireArguments<HashMap<String, Any>>()
+        val interval = map.requireValue(Extras.HEADER_BEAT_INTERVAL_MS) as Int
         Log.i(TAG, "调用信鸽SDK-->setHeartbeatIntervalMs()----->interval=${interval}")
         XGPushConfig.setHeartbeatIntervalMs(mPluginBinding.applicationContext, interval)
     }
@@ -195,8 +207,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun setXgTag(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<HashMap<String, String>>()
-        val tagName = map[Extras.TAG_NAME]
+        val map = call.requireArguments<HashMap<String, String>>()
+        val tagName = map.requireValue(Extras.TAG_NAME)
         val context = mPluginBinding.applicationContext
         Log.i(TAG, "调用信鸽SDK-->setTag()---->tagName${tagName}")
         XGPushManager.setTag(context, tagName, object : XGIOperateCallback {
@@ -222,8 +234,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
     </String> */
     fun setXgTags(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, List<String>>>()
-        val tags = HashSet<String>(map[Extras.TAG_NAMES])
+        val map = call.requireArguments<Map<String, List<String>>>()
+        val tags = HashSet<String>(map.requireValue(Extras.TAG_NAMES))
         //operateName用户定义的操作名称，回调结果会原样返回，用于标识回调属于哪次操作。
         val operateName = "setTags:" + System.currentTimeMillis()
         val context = mPluginBinding.applicationContext
@@ -260,8 +272,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
     </String> */
     fun addXgTags(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, List<String>>>()
-        val tags = HashSet<String>(map[Extras.TAG_NAMES])
+        val map = call.requireArguments<Map<String, List<String>>>()
+        val tags = HashSet<String>(map.requireValue(Extras.TAG_NAMES))
         //operateName用户定义的操作名称，回调结果会原样返回，用于标识回调属于哪次操作。
         val operateName = "addTags:" + System.currentTimeMillis()
         val context = mPluginBinding.applicationContext
@@ -288,8 +300,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun deleteXgTag(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val tagName = map[Extras.TAG_NAME]
+        val map = call.requireArguments<Map<String, String>>()
+        val tagName = map.requireValue(Extras.TAG_NAME)
         val context = mPluginBinding.applicationContext
         Log.i(TAG, "调用信鸽SDK-->deleteTag()----tagName=${tagName}")
         XGPushManager.deleteTag(context, tagName, object : XGIOperateCallback {
@@ -317,8 +329,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
     </String> */
     fun deleteXgTags(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, List<String>>>()
-        val tags = HashSet<String>(map[Extras.TAG_NAMES])
+        val map = call.requireArguments<Map<String, List<String>>>()
+        val tags = HashSet<String>(map.requireValue(Extras.TAG_NAMES))
         //operateName用户定义的操作名称，回调结果会原样返回，用于标识回调属于哪次操作。
         val operateName = "deleteTags:" + System.currentTimeMillis()
         val context = mPluginBinding.applicationContext
@@ -413,10 +425,10 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun bindAccount(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val account = map[Extras.ACCOUNT]
+        val map = call.requireArguments<Map<String, String>>()
+        val account = map.requireValue(Extras.ACCOUNT)
         val context = mPluginBinding.applicationContext
-        var accountType: String = (map[Extras.ACCOUNT_TYPE]) ?: "UNKNOWN"
+        var accountType: String = (map.requireValue(Extras.ACCOUNT_TYPE)) ?: "UNKNOWN"
         Log.i(TAG, "调用信鸽SDK-->bindAccount()----account=${account}, accountType=${accountType}")
         XGPushManager.bindAccount(context, account, getAccountType(accountType), object : XGIOperateCallback {
             override fun onSuccess(p0: Any?, p1: Int) {
@@ -441,10 +453,10 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun appendAccount(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val account = map[Extras.ACCOUNT]
+        val map = call.requireArguments<Map<String, String>>()
+        val account = map.requireValue(Extras.ACCOUNT)
         val context = mPluginBinding.applicationContext
-        var accountType: String = (map[Extras.ACCOUNT_TYPE]) ?: "UNKNOWN"
+        var accountType: String = (map.requireValue(Extras.ACCOUNT_TYPE)) ?: "UNKNOWN"
         Log.i(TAG, "调用信鸽SDK-->appendAccount()----account=${account}, accountType=${accountType}")
         XGPushManager.appendAccount(context, account, getAccountType(accountType), object : XGIOperateCallback {
             override fun onSuccess(p0: Any?, p1: Int) {
@@ -469,10 +481,10 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun delAccount(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val account = map[Extras.ACCOUNT]
+        val map = call.requireArguments<Map<String, String>>()
+        val account = map.requireValue(Extras.ACCOUNT)
         val context = mPluginBinding.applicationContext
-        var accountType: String = (map[Extras.ACCOUNT_TYPE]) ?: "UNKNOWN"
+        var accountType: String = (map.requireValue(Extras.ACCOUNT_TYPE)) ?: "UNKNOWN"
         Log.i(TAG, "调用信鸽SDK-->delAccount()----account=${account}, accountType=${accountType}")
         XGPushManager.delAccount(context, account, getAccountType(accountType), object : XGIOperateCallback {
             override fun onSuccess(p0: Any?, p1: Int) {
@@ -514,8 +526,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 新增用户属性
      */
     fun upsertAttributes(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val attributesMap = map[Extras.ATTRIBUTES] as HashMap<String, String>
+        val map = call.requireArguments<Map<String, String>>()
+        val attributesMap = map.requireValue(Extras.ATTRIBUTES) as HashMap<String, String>
         Log.i(TAG, "调用信鸽SDK-->upsertAttributes()----->attributes=${attributesMap}")
         val context = mPluginBinding.applicationContext
         XGPushManager.upsertAttributes(context, "upsertAttributes", attributesMap, object : XGIOperateCallback {
@@ -537,8 +549,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 删除用户属性
      */
     fun delAttributes(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, List<String>>>()
-        val attributesList = HashSet<String>(map[Extras.ATTRIBUTES])
+        val map = call.requireArguments<Map<String, List<String>>>()
+        val attributesList = HashSet<String>(map.requireValue(Extras.ATTRIBUTES))
         Log.i(TAG, "调用信鸽SDK-->delAttributes()----->attributes=${attributesList}")
         val context = mPluginBinding.applicationContext
         XGPushManager.delAttributes(context, "delAttributes", attributesList, object : XGIOperateCallback {
@@ -560,8 +572,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 更新用户属性
      */
     fun clearAndAppendAttributes(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val attributesMap = map[Extras.ATTRIBUTES] as HashMap<String, String>
+        val map = call.requireArguments<Map<String, String>>()
+        val attributesMap = map.requireValue(Extras.ATTRIBUTES) as HashMap<String, String>
         Log.i(TAG, "调用信鸽SDK-->clearAndAppendAttributes()----->attributes=${attributesMap}")
         val context = mPluginBinding.applicationContext
         XGPushManager.clearAndAppendAttributes(context, "clearAndAppendAttributes", attributesMap, object : XGIOperateCallback {
@@ -612,8 +624,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 开启其他推送  XGPushManager.registerPush 前，开启第三方推送
      */
     fun enableOtherPush2(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<HashMap<String, Any>>()
-        val enable = map["enable"] as Boolean
+        val map = call.requireArguments<HashMap<String, Any>>()
+        val enable = map.requireValue("enable") as Boolean
         Log.i(TAG, "调用信鸽SDK-->enableOtherPush2()")
         XGPushConfig.enableOtherPush(mPluginBinding.applicationContext, enable)
     }
@@ -637,15 +649,15 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     fun enablePullUpOtherApp(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<HashMap<String, Any>>()
-        val enable = map["enable"] as Boolean
+        val map = call.requireArguments<HashMap<String, Any>>()
+        val enable = map.requireValue("enable") as Boolean
         Log.i(TAG, "调用信鸽SDK-->enablePullUpOtherApp()")
         XGPushConfig.enablePullUpOtherApp(mPluginBinding.applicationContext, enable)
     }
 
     fun setBadgeNum(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, Int>>()
-        val badgeNum = map[Extras.BADGE_NUM] as Int
+        val map = call.requireArguments<Map<String, Int>>()
+        val badgeNum = map.requireValue(Extras.BADGE_NUM) as Int
         Log.i(TAG, "调用信鸽SDK-->setBadgeNum()-----badgeNum=${badgeNum}")
         XGPushConfig.setBadgeNum(mPluginBinding.applicationContext, badgeNum)
     }
@@ -661,18 +673,18 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     fun createNotificationChannel(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, Int>>()
-        val channelId = map[Extras.CHANNEL_ID] as String
-        val channelName = map[Extras.CHANNEL_NAME] as String
+        val map = call.requireArguments<Map<String, Any>>()
+        val channelId = map.requireValue(Extras.CHANNEL_ID) as String
+        val channelName = map.requireValue(Extras.CHANNEL_NAME) as String
         if (map.size == 2) {
             Log.i(TAG, "调用信鸽SDK-->createNotificationChannel(${channelId}, ${channelName})")
             XGPushManager.createNotificationChannel(mPluginBinding.applicationContext, 
                 channelId, channelName, true, true, true, null)
         } else {
-            val enableVibration = map[Extras.ENABLE_VIBRATION] as Boolean
-            val enableLights = map[Extras.ENABLE_LIGHTS] as Boolean
-            val enableSound = map[Extras.ENABLE_SOUND] as Boolean
-            val soundFileName = map[Extras.SOUND_FILE_NAME] as String
+            val enableVibration = map.requireValue(Extras.ENABLE_VIBRATION) as Boolean
+            val enableLights = map.requireValue(Extras.ENABLE_LIGHTS) as Boolean
+            val enableSound = map.requireValue(Extras.ENABLE_SOUND) as Boolean
+            val soundFileName = map.requireValue(Extras.SOUND_FILE_NAME) as String
 
             val context = mPluginBinding.applicationContext
             val soundFileId = context.getResources().getIdentifier(soundFileName, "raw", context.getPackageName())
@@ -698,8 +710,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun setMiPushAppKey(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val appKey = map[Extras.APP_KEY]
+        val map = call.requireArguments<Map<String, String>>()
+        val appKey = map.requireValue(Extras.APP_KEY)
         Log.i(TAG, "调用信鸽SDK-->setMiPushAppKey()-----key=${appKey}")
         XGPushConfig.setMiPushAppKey(mPluginBinding.applicationContext, appKey)
     }
@@ -711,8 +723,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result 结果
      */
     fun setMiPushAppId(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val appId = map[Extras.APP_ID]
+        val map = call.requireArguments<Map<String, String>>()
+        val appId = map.requireValue(Extras.APP_ID)
         Log.i(TAG, "调用信鸽SDK-->setMiPushAppId()-----appId=${appId}")
         XGPushConfig.setMiPushAppId(mPluginBinding.applicationContext, appId)
     }
@@ -722,8 +734,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置魅族平台的的APP_KEy
      */
     fun setMzPushAppKey(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val appKey = map[Extras.APP_KEY]
+        val map = call.requireArguments<Map<String, String>>()
+        val appKey = map.requireValue(Extras.APP_KEY)
         Log.i(TAG, "调用信鸽SDK-->setMzPushAppKey()-----appKey=${appKey}")
         XGPushConfig.setMzPushAppKey(mPluginBinding.applicationContext, appKey)
     }
@@ -732,8 +744,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 设置魅族平台的的APP_KEy
      */
     fun setMzPushAppId(call: MethodCall, result: MethodChannel.Result?) {
-        val map = call.arguments<Map<String, String>>()
-        val appId = map[Extras.APP_ID]
+        val map = call.requireArguments<Map<String, String>>()
+        val appId = map.requireValue(Extras.APP_ID)
         Log.i(TAG, "调用信鸽SDK-->setMzPushAppId()-----appId=${appId}")
         XGPushConfig.setMzPushAppId(mPluginBinding.applicationContext, appId)
     }
@@ -743,8 +755,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * 在应用首次启动时弹出通知栏权限请求窗口，应用安装周期内，提示弹窗仅展示一次。需 TPNS-OPPO 依赖包版本在 1.1.5.1 及以上支持，系统 ColorOS 5.0 以上有效。
      */
     private fun enableOppoNotification(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, Any>>()
-        val isNotification = map["isNotification"] as Boolean
+        val map = call.requireArguments<Map<String, Any>>()
+        val isNotification = map.requireValue("isNotification") as Boolean
         Log.i(TAG, "调用信鸽SDK-->enableOppoNotification()-----isNotification=${isNotification}")
         XGPushConfig.enableOppoNotification(mPluginBinding.applicationContext, isNotification)
     }
@@ -756,8 +768,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result
      */
     private fun setOppoPushAppKey(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, String>>()
-        val appKey = map[Extras.APP_KEY]
+        val map = call.requireArguments<Map<String, String>>()
+        val appKey = map.requireValue(Extras.APP_KEY)
         Log.i(TAG, "调用信鸽SDK-->setOppoPushAppKey()-----appKey=${appKey}")
         XGPushConfig.setOppoPushAppKey(mPluginBinding.applicationContext, appKey)
     }
@@ -769,8 +781,8 @@ public class XgFlutterPlugin : FlutterPlugin, MethodCallHandler {
      * @param result
      */
     private fun setOppoPushAppId(call: MethodCall, result: MethodChannel.Result) {
-        val map = call.arguments<Map<String, String>>()
-        val appId = map[Extras.APP_ID]
+        val map = call.requireArguments<Map<String, String>>()
+        val appId = map.requireValue(Extras.APP_ID)
         Log.i(TAG, "调用信鸽SDK-->setOppoPushAppId()-----appId=${appId}")
         XGPushConfig.setOppoPushAppId(mPluginBinding.applicationContext, appId)
     }
