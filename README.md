@@ -1,12 +1,16 @@
 # tpns_flutter_plugin
 
+> 本 fork 基于腾讯官方 TPNS Flutter Plugin V1.3.8，增加新版 Flutter / Gradle 9 / AGP 9 / Kotlin 2.x 构建兼容。
+>
+> Android 侧移除了 jcenter、内置 AGP/Kotlin 旧版本和 Flutter v1 embedding；Java/Kotlin JVM target 统一为 17。TPNS 业务 API 与原插件保持一致。
+
 ## 安装
 - 在工程 pubspec.yaml 中加入 dependencies，在命令行中运行：flutter pub get进行安装
 ```yaml
       dependencies:
         tpns_flutter_plugin:
           git:
-            url: https://github.com/TencentCloud/TPNS-Flutter-Plugin
+            url: https://github.com/xu756/TPNS-Flutter-Plugin
             ref: V1.3.8
 ```
 
